@@ -373,6 +373,11 @@ foreign import WINDOWS_CCONV "windows.h SuspendThread"
 foreign import WINDOWS_CCONV "windows.h ResumeThread"
     c_ResumeThread :: THANDLE -> IO DWORD
 
+createRemoteThread :: HANDLE -> Ptr Word8 -> DWORD -> Addr -> Ptr Word8 -> DWORD -> Ptr Word8 -> IO HANDLE
+createRemoteThread proc threadAttr dwSize start params creation threadId = failIfNull "CreateRemoteThread" $ c_CreateRemoteThread proc threadAttr dwSize start params creation threadId
+foreign import WINDOWS_CCONV unsafe "windows.h CreateRemoteThread"
+  c_CreateRemoteThread :: HANDLE -> Ptr Word8 -> DWORD -> Addr -> Ptr Word8 -> DWORD -> Ptr Word8 -> IO HANDLE
+
 foreign import WINDOWS_CCONV "windows.h WaitForDebugEvent"
     c_WaitForDebugEvent :: Ptr () -> DWORD -> IO BOOL
 
