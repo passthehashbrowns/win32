@@ -239,6 +239,141 @@ newtype GET_FILEEX_INFO_LEVELS = GET_FILEEX_INFO_LEVELS (#type GET_FILEEX_INFO_L
 
 ----------------------------------------------------------------
 
+data STARTUPINFOA = STARTUPINFOA {
+  cb :: DWORD,
+  lpReserved :: LPCSTR,
+  lpDesktop :: LPCSTR,
+  lpTitle :: LPCSTR,
+  dwX :: DWORD,
+  dwY :: DWORD,
+  dwXSize :: DWORD,
+  dwYSize :: DWORD,
+  dwXCountChars :: DWORD,
+  dwYCountChars :: DWORD,
+  dwFillAttribute :: DWORD,
+  dwFlags :: DWORD,
+  wShowWindow :: Word,
+  cbReserved2 :: Word,
+  lpReserved2 :: LPBYTE,
+  hStdInput :: HANDLE,
+  hStdOutput :: HANDLE,
+  hStdError :: HANDLE
+} deriving Show
+
+type LPStartupInfoA = Ptr STARTUPINFOA
+
+instance Storable STARTUPINFOA where
+  sizeOf = const #{size STARTUPINFOA}
+  alignment _ = #alignment STARTUPINFOA
+
+  poke buf input = do
+    (#poke STARTUPINFOA, cb) buf (cb input)
+    (#poke STARTUPINFOA, lpReserved) buf (lpReserved input)
+    (#poke STARTUPINFOA, lpDesktop) buf (lpDesktop input)
+    (#poke STARTUPINFOA, lpTitle) buf (lpTitle input)
+    (#poke STARTUPINFOA, dwX) buf (dwX input)
+    (#poke STARTUPINFOA, dwY) buf (dwY input)
+    (#poke STARTUPINFOA, dwXSize) buf (dwXSize input)
+    (#poke STARTUPINFOA, dwYSize) buf (dwYSize input)
+    (#poke STARTUPINFOA, dwXCountChars) buf (dwXCountChars input)
+    (#poke STARTUPINFOA, dwYCountChars) buf (dwYCountChars input)
+    (#poke STARTUPINFOA, dwFillAttribute) buf (dwFillAttribute input)
+    (#poke STARTUPINFOA, dwFlags) buf (dwFlags input)
+    (#poke STARTUPINFOA, wShowWindow) buf (wShowWindow input)
+    (#poke STARTUPINFOA, cbReserved2) buf (cbReserved2 input)
+    (#poke STARTUPINFOA, lpReserved2) buf (lpReserved2 input)
+    (#poke STARTUPINFOA, hStdInput) buf (hStdInput input)
+    (#poke STARTUPINFOA, hStdOutput) buf (hStdOutput input)
+    (#poke STARTUPINFOA, hStdError) buf (hStdError input)
+
+  peek p = do
+    cb' <- (#peek STARTUPINFOA, cb) p
+    lpReserved' <- (#peek STARTUPINFOA, lpReserved) p
+    lpDesktop' <- (#peek STARTUPINFOA, lpDesktop) p
+    lpTitle' <- (#peek STARTUPINFOA, lpTitle) p
+    dwX' <- (#peek STARTUPINFOA, dwX) p
+    dwY' <- (#peek STARTUPINFOA, dwY) p
+    dwXSize' <- (#peek STARTUPINFOA, dwXSize) p
+    dwYSize' <- (#peek STARTUPINFOA, dwYSize) p
+    dwXCountChars' <- (#peek STARTUPINFOA, dwXCountChars) p
+    dwYCountChars' <- (#peek STARTUPINFOA, dwYCountChars) p
+    dwFillAttribute' <- (#peek STARTUPINFOA, dwFillAttribute) p
+    dwFlags' <- (#peek STARTUPINFOA, dwFlags) p
+    wShowWindow' <- (#peek STARTUPINFOA, wShowWindow) p
+    cbReserved2' <- (#peek STARTUPINFOA, cbReserved2) p
+    lpReserved2' <- (#peek STARTUPINFOA, lpReserved2) p
+    hStdInput' <- (#peek STARTUPINFOA, hStdInput) p
+    hStdOutput' <- (#peek STARTUPINFOA, hStdOutput) p
+    hStdError' <- (#peek STARTUPINFOA, hStdError) p
+    return $ STARTUPINFOA cb' lpReserved' lpDesktop' lpTitle' dwX' dwY' dwXSize' dwYSize' dwXCountChars' dwYCountChars' dwFillAttribute' dwFlags' wShowWindow' cbReserved2' lpReserved2' hStdInput' hStdOutput' hStdError'
+
+
+foreign import WINDOWS_CCONV unsafe "windows.h InitializeProcThreadAttributeList"
+  c_InitializeProcThreadAttributeList :: Ptr () -> DWORD -> DWORD -> Ptr SIZE_T -> IO BOOL
+
+foreign import WINDOWS_CCONV unsafe "windows.h UpdateProcThreadAttribute"
+  c_UpdateProcThreadAttribute :: Ptr () -> DWORD -> DWORD64 -> Ptr DWORD64 -> DWORD -> Ptr () -> Ptr () -> IO BOOL
+
+data STARTUPINFOEXA = STARTUPINFOEXA {
+  startupInfo :: Ptr STARTUPINFOA,
+  lpAttributeList :: Ptr ()
+} deriving (Show)
+
+type LPSTARTUPINFOEXA = Ptr STARTUPINFOEXA
+
+instance Storable STARTUPINFOEXA where
+  sizeOf = const #{size STARTUPINFOEXA}
+  alignment _ = #alignment STARTUPINFOEXA
+
+  poke buf input = do
+    (#poke STARTUPINFOEXA, StartupInfo) buf (startupInfo input)
+    (#poke STARTUPINFOEXA, lpAttributeList) buf (lpAttributeList input)
+
+  peek p = do
+    startupInfo' <- (#peek STARTUPINFOEXA, StartupInfo) p
+    lpAttributeList' <- (#peek STARTUPINFOEXA, lpAttributeList) p
+    return $ STARTUPINFOEXA startupInfo' lpAttributeList'
+
+data PROCESS_INFORMATION = PROCESS_INFORMATION {
+  hProcess :: HANDLE,
+  hThread :: HANDLE,
+  dwProcessId :: DWORD,
+  dwThreadId :: DWORD
+} deriving (Show)
+
+type LPPROCESS_INFORMATION = Ptr PROCESS_INFORMATION
+type TESTPROCESS_INFORMATION = PROCESS_INFORMATION
+instance Storable PROCESS_INFORMATION where
+  sizeOf = const #{size PROCESS_INFORMATION}
+  alignment _ = #alignment PROCESS_INFORMATION
+
+  poke buf input = do
+    (#poke PROCESS_INFORMATION, hProcess) buf (hProcess input)
+    (#poke PROCESS_INFORMATION, hThread) buf (hThread input)
+    (#poke PROCESS_INFORMATION, dwProcessId) buf (dwProcessId input)
+    (#poke PROCESS_INFORMATION, dwThreadId) buf (dwThreadId input)
+
+  peek p = do
+    process <- (#peek PROCESS_INFORMATION, hProcess) p
+    thread <- (#peek PROCESS_INFORMATION, hThread) p
+    procId <-  (#peek PROCESS_INFORMATION, dwProcessId) p
+    threadId <- (#peek PROCESS_INFORMATION, dwThreadId) p
+    return $ PROCESS_INFORMATION process thread procId threadId
+
+type ProcessCreationFlags = DWORD
+#{enum ProcessCreationFlags,
+  , eXTENDED_STARTUPINFO_PRESENT = EXTENDED_STARTUPINFO_PRESENT
+  }
+
+
+--createProcess :: LPCSTR -> LPCSTR -> Ptr () -> Ptr () -> BOOL -> DWORD -> Ptr () -> LPCSTR -> DWORD -> PROCESS_INFORMATION -> IO BOOL
+--createProcess appName commandLine procAttr threadAttr inheritHandles dwCreationFlags lpEnvironment lpCurrentDir startupInfo processInfo = failIfNull "createProcess" $ c_CreateProcess appName commandLine procAttr threadAttr inheritHandles dwCreationFlags lpEnvironment lpCurrentDir startupInfo processInfo
+foreign import WINDOWS_CCONV unsafe "windows.h CreateProcessA"
+  c_CreateProcess :: LPCSTR -> LPCSTR -> Ptr () -> Ptr () -> BOOL -> DWORD -> Ptr () -> LPCSTR -> LPSTARTUPINFOEXA -> LPPROCESS_INFORMATION -> IO BOOL
+
+
+
+
 data SECURITY_ATTRIBUTES = SECURITY_ATTRIBUTES
     { nLength              :: !DWORD
     , lpSecurityDescriptor :: !LPVOID

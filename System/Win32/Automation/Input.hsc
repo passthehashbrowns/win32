@@ -58,7 +58,7 @@ makeKeyboardInput vkey flag = do
            $ KEYBDINPUT {
                  wVk   = fromIntegral vkey
                , wScan = fromIntegral scan
-               , dwFlags = flag'
+               , dwFlags2 = flag'
                , time = 0
                , dwExtraInfo = fromIntegral $ dwExtraInfo'
                }

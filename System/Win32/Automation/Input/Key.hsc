@@ -25,7 +25,7 @@ type PKEYBDINPUT = Ptr KEYBDINPUT
 data KEYBDINPUT = KEYBDINPUT
      { wVk         :: WORD
      , wScan       :: WORD
-     , dwFlags     :: DWORD
+     , dwFlags2     :: DWORD
      , time        :: DWORD
      , dwExtraInfo :: ULONG_PTR
      } deriving Show
@@ -36,7 +36,7 @@ instance Storable KEYBDINPUT where
     poke buf input = do
         (#poke KEYBDINPUT, wVk)     buf (wVk input)
         (#poke KEYBDINPUT, wScan)   buf (wScan input)
-        (#poke KEYBDINPUT, dwFlags) buf (dwFlags input)
+        (#poke KEYBDINPUT, dwFlags) buf (dwFlags2 input)
         (#poke KEYBDINPUT, time)    buf (time input)
         (#poke KEYBDINPUT, dwExtraInfo) buf (dwExtraInfo input)
     peek buf = do
